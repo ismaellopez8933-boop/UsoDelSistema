@@ -1,0 +1,43 @@
+package org.example.usodelsistema.controllers;
+
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import org.example.usodelsistema.HelloApplication;
+
+import java.io.IOException;
+
+public class HelloController {
+    @FXML
+    private Label welcomeText;
+
+    @FXML
+    protected void onHelloButtonClick() {
+        welcomeText.setText("ola choy omelo chino");
+    }
+
+    @FXML
+    protected void onAddButtonClick() {
+        abrirVentana("add-view.fxml", "Agregar Proceso");
+    }
+
+    @FXML
+    protected void onDeleteButtonClick() {
+        abrirVentana("delete-view.fxml", "Eliminar Proceso");
+    }
+
+    private void abrirVentana(String fxml, String titulo) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(fxml));
+            Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+            Stage stage = new Stage();
+            stage.setTitle(titulo);
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

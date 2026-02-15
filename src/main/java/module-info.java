@@ -8,4 +8,6 @@ module org.example.usodelsistema {
     opens org.example.usodelsistema to javafx.fxml;
     exports org.example.usodelsistema;
     exports org.example.usodelsistema.dao;
+    exports org.example.usodelsistema.controllers;
+    opens org.example.usodelsistema.controllers to javafx.fxml;
 }

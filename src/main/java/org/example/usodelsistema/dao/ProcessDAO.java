@@ -9,12 +9,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProcesoDAO {
+public class ProcessDAO {
 
     public void insertarProceso(Proceso proceso) {
         String sql = "INSERT INTO proceso (nombre, tamaño, hora_llegada) VALUES (?, ?, ?)";
 
-        try (Connection conn = Conexion.getConnection();
+        try (java.sql.Connection conn = Connection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, proceso.getId());
@@ -34,7 +34,7 @@ public class ProcesoDAO {
         List<Proceso> procesos = new ArrayList<>();
         String sql = "SELECT * FROM proceso";
 
-        try (Connection conn = Conexion.getConnection();
+        try (java.sql.Connection conn = Connection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
@@ -60,7 +60,7 @@ public class ProcesoDAO {
     public void eliminarProceso(String nombre) {
         String sql = "DELETE FROM proceso WHERE nombre = ?";
 
-        try (Connection conn = Conexion.getConnection();
+        try (java.sql.Connection conn = Connection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, nombre);

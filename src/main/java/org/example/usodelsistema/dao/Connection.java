@@ -1,12 +1,11 @@
 package org.example.usodelsistema.dao;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Conexion {
+public class Connection {
     // Instancia única de la conexión (Singleton)
-    private static Connection connection;
+    private static java.sql.Connection connection;
 
     // Datos de conexión
     // TODO: Reemplaza con el nombre real de tu base de datos
@@ -15,9 +14,9 @@ public class Conexion {
     private static final String PASSWORD = "123"; // Contraseña
 
     // Constructor privado para evitar instanciación externa
-    private Conexion() {}
+    private Connection() {}
 
-    public static Connection getConnection() throws SQLException {
+    public static java.sql.Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             try {
                 // Cargar el driver explícitamente (opcional en versiones nuevas de Java, pero buena práctica)
