@@ -3,18 +3,18 @@ package org.example.usodelsistema.dao;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class Connection {
+public class Conexion {
     // Instancia única de la conexión (Singleton)
     private static java.sql.Connection connection;
 
-    // Datos de conexión
+    // Cambia el puerto al de MySQL
     // TODO: Reemplaza con el nombre real de tu base de datos
     private static final String URL = "jdbc:mariadb://localhost:3306/sistema"; //Nombre de la base de datos
     private static final String USER = "adminSistema"; //usuario
     private static final String PASSWORD = "123"; // Contraseña
 
     // Constructor privado para evitar instanciación externa
-    private Connection() {}
+    private Conexion() {}
 
     public static java.sql.Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {

@@ -20,18 +20,18 @@ public class HelloController {
 
     @FXML
     protected void onAddButtonClick() {
-        abrirVentana("add-view.fxml", "Agregar Proceso");
+        abrirVentana("add-view.fxml", "Agregar Proceso", 400, 300);
     }
 
     @FXML
     protected void onDeleteButtonClick() {
-        abrirVentana("delete-view.fxml", "Eliminar Proceso");
+        abrirVentana("delete-view.fxml", "Eliminar Proceso", 400, 200);
     }
 
-    private void abrirVentana(String fxml, String titulo) {
+    private void abrirVentana(String fxml, String titulo, int width, int height) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource(fxml));
-            Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+            Scene scene = new Scene(fxmlLoader.load(), width, height);
             Stage stage = new Stage();
             stage.setTitle(titulo);
             stage.setScene(scene);
