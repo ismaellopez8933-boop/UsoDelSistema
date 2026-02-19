@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.usodelsistema.controllers.AddController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+
+    <HBox spacing="15">
+       <Label text="Nombre del proceso"/>
+       <TextField fx:id="processFld"/>
+    </HBox>
+
+    <HBox spacing="15">
+        <Label text="Tamaño del proceso"/>
+        <TextField fx:id="sizeFld"/>
+    </HBox>
+
+    <Button text="Agregar" alignment="CENTER" onAction="#onAddButtonClick"/>
+</VBox>

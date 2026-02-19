@@ -36,6 +36,9 @@ javafx {
 }
 
 dependencies {
+    // MariaDB Driver
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 }
