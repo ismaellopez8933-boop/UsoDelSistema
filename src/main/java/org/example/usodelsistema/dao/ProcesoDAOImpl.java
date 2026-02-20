@@ -13,20 +13,34 @@ public class ProcesoDAOImpl implements IProcesoDAO {
 
     @Override
     public void insertar(Proceso proceso) {
-        String sql = "INSERT INTO proceso (nombre, tamaño, hora_llegada) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO proceso (nombre, tamaño, hora_llegada, status, tiempo_espera, tiempo_sistema) VALUES (?, ?, ?, ?, ?, ?)";
 
+        // Usamos RETURN_GENERATED_KEYS para obtener el ID autoincrementable
         try (Connection conn = Conexion.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            pstmt.setString(1, proceso.getId());
+            pstmt.setString(1, proceso.getId()); // Nombre lógico (ej: "P1")
             pstmt.setDouble(2, proceso.getTamaño());
             
-            // Convertimos LocalDateTime a Time para la columna hora_llegada
             LocalTime hora = proceso.getLlegada() != null ? proceso.getLlegada().toLocalTime() : LocalTime.now();
             pstmt.setTime(3, Time.valueOf(hora));
+            
+            pstmt.setInt(4, proceso.getEstadoInt());
+            pstmt.setInt(5, proceso.getTiempoEspera());
+            pstmt.setInt(6, proceso.getTiempoSistema());
 
-            pstmt.executeUpdate();
-            System.out.println("Proceso insertado correctamente: " + proceso.getId());
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+                // Recuperamos el ID generado
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int idGenerado = generatedKeys.getInt(1);
+                        proceso.setIdBaseDatos(idGenerado); // Guardamos el ID de BD en el objeto
+                        System.out.println("Proceso insertado con ID de BD: " + idGenerado);
+                    }
+                }
+            }
 
         } catch (SQLException e) {
             System.err.println("Error al insertar proceso: " + e.getMessage());
@@ -35,6 +49,7 @@ public class ProcesoDAOImpl implements IProcesoDAO {
 
     @Override
     public void eliminar(String nombre) {
+        // Seguimos eliminando por nombre lógico, ya que es lo que usas en la UI
         String sql = "DELETE FROM proceso WHERE nombre = ?";
 
         try (Connection conn = Conexion.getConnection();
@@ -64,16 +79,30 @@ public class ProcesoDAOImpl implements IProcesoDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                // Recuperamos el ID autoincrementable
+                int idBd = rs.getInt("id_proceso");
+                
                 String nombre = rs.getString("nombre");
                 double tamano = rs.getDouble("tamaño");
                 Time horaLlegada = rs.getTime("hora_llegada");
+                
+                int status = rs.getInt("status");
+                int tiempoEspera = rs.getInt("tiempo_espera");
+                int tiempoSistema = rs.getInt("tiempo_sistema");
 
                 // Reconstruimos el objeto Proceso
                 Proceso p = new Proceso(nombre, (int) tamano);
                 
+                // Asignamos el ID de la base de datos
+                p.setIdBaseDatos(idBd);
+                
                 if (horaLlegada != null) {
                     p.setLlegada(LocalDateTime.of(LocalDate.now(), horaLlegada.toLocalTime()));
                 }
+                
+                p.setEstadoFromInt(status);
+                p.setTiempoEspera(tiempoEspera);
+                p.setTiempoSistema(tiempoSistema);
                 
                 procesos.add(p);
             }
