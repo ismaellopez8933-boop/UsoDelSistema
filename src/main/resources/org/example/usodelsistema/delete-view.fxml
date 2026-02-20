@@ -1,20 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.usodelsistema.controllers.DeleteController">
+<VBox alignment="CENTER" spacing="15.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.usodelsistema.controllers.DeleteController"
+      stylesheets="@styles.css" styleClass="root">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <HBox spacing="15">
-        <Label text="Proceso a eliminar"/>
-        <TextField fx:id="processFld"/>
-    </HBox>
+    <Label text="Eliminar Proceso" styleClass="header-label"/>
 
-    <Button text="Eliminar" alignment="CENTER" onAction="#onDeleteButtonClick"/>
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label text="Nombre del Proceso a eliminar:" styleClass="label"/>
+        <TextField fx:id="txtNombreEliminar" promptText="Ej. P1" styleClass="text-field"/>
+    </VBox>
+
+    <HBox alignment="CENTER" spacing="20.0">
+        <Button text="Eliminar" onAction="#onEliminarButtonClick" styleClass="button-danger"/>
+        <Button text="Cancelar" onAction="#onBackButtonClick" styleClass="button"/>
+    </HBox>
 </VBox>

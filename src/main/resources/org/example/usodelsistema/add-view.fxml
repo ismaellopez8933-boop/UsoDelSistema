@@ -3,25 +3,35 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.usodelsistema.controllers.AddController">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="15.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.usodelsistema.controllers.AddController"
+      stylesheets="@styles.css" styleClass="root">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <HBox spacing="15">
-       <Label text="Nombre del proceso"/>
-       <TextField fx:id="processFld"/>
-    </HBox>
+    <Label text="Agregar Nuevo Proceso" styleClass="header-label"/>
 
-    <HBox spacing="15">
-        <Label text="Tamaño del proceso"/>
-        <TextField fx:id="sizeFld"/>
-    </HBox>
+    <!-- Campo para el Nombre (ID Lógico) -->
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label text="Nombre del Proceso (ej. P1):" styleClass="label"/>
+        <TextField fx:id="txtNombre" promptText="Ingrese el nombre" styleClass="text-field"/>
+    </VBox>
 
-    <Button text="Agregar" alignment="CENTER" onAction="#onAddButtonClick"/>
+    <!-- Campo para el Tamaño -->
+    <VBox spacing="5.0" alignment="CENTER_LEFT">
+        <Label text="Tamaño (unidades de memoria):" styleClass="label"/>
+        <TextField fx:id="txtTamano" promptText="Ingrese el tamaño (número)" styleClass="text-field"/>
+    </VBox>
+
+    <!-- Botones de Acción -->
+    <HBox alignment="CENTER" spacing="20.0">
+        <Button text="Guardar" onAction="#onGuardarButtonClick" styleClass="button-success"/>
+        <Button text="Cancelar" onAction="#onBackButtonClick" styleClass="button-danger"/>
+    </HBox>
 </VBox>

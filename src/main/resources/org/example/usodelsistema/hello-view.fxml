@@ -5,22 +5,36 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.shape.Rectangle?>
 
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.usodelsistema.controllers.HelloController">
+      fx:controller="org.example.usodelsistema.controllers.HelloController"
+      stylesheets="@styles.css" styleClass="root">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
-    <Label fx:id="welcomeText"/>
+    <Label fx:id="welcomeText" text="Simulador de Memoria (Total: 100)" styleClass="header-label"/>
 
-    <!-- Contenedor horizontal para poner el rectángulo y el botón lado a lado -->
     <HBox alignment="CENTER" spacing="50.0">
-        <!-- Rectángulo de referencia -->
-        <Rectangle width="100" height="400" fill="DODGERBLUE" stroke="BLACK"/>
+        <!-- Representación Visual de la Memoria -->
+        <VBox spacing="5.0" alignment="BOTTOM_CENTER">
+            <Label text="Memoria RAM" styleClass="label"/>
+            <!-- Contenedor de la memoria: Borde negro, fondo blanco -->
+            <StackPane fx:id="contenedorMemoria" prefWidth="100" prefHeight="400"
+                       styleClass="memory-container">
+                <!-- Aquí se agregarán dinámicamente los rectángulos de los procesos -->
+                <VBox fx:id="vboxProcesos" alignment="BOTTOM_CENTER" prefWidth="100" prefHeight="400" />
+            </StackPane>
+        </VBox>
 
-        <Button text="Agregar" onAction="#onAddButtonClick"/>
+        <!-- Panel de Control -->
+        <VBox spacing="15.0" alignment="CENTER">
+            <Button text="Agregar Proceso" onAction="#onAddButtonClick" prefWidth="150" styleClass="button-success"/>
+            <Button text="Eliminar Proceso" onAction="#onDeleteButtonClick" prefWidth="150" styleClass="button-danger"/>
+            <Button text="Ver Historial" onAction="#onReportButtonClick" prefWidth="150" styleClass="button"/>
+            <Label fx:id="lblEstadoMemoria" text="Disponible: 100 / 100" styleClass="label"/>
+        </VBox>
     </HBox>
-    <Button text="Eliminar" onAction="#onDeleteButtonClick"/>
 </VBox>

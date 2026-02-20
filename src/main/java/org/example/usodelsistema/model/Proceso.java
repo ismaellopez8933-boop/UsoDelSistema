@@ -1,5 +1,6 @@
 package org.example.usodelsistema.model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class Proceso {
@@ -18,8 +19,9 @@ public class Proceso {
     private LocalDateTime salida;
     private String estado;
     
-    private int tiempoEspera;
-    private int tiempoSistema;
+    // Estos campos se calcularán automáticamente
+    private long tiempoEspera;
+    private long tiempoSistema;
 
     public Proceso(String id, int tamaño) {
         this.id = id;
@@ -51,11 +53,11 @@ public class Proceso {
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
 
-    public int getTiempoEspera() { return tiempoEspera; }
-    public void setTiempoEspera(int tiempoEspera) { this.tiempoEspera = tiempoEspera; }
+    public long getTiempoEspera() { return tiempoEspera; }
+    public void setTiempoEspera(long tiempoEspera) { this.tiempoEspera = tiempoEspera; }
 
-    public int getTiempoSistema() { return tiempoSistema; }
-    public void setTiempoSistema(int tiempoSistema) { this.tiempoSistema = tiempoSistema; }
+    public long getTiempoSistema() { return tiempoSistema; }
+    public void setTiempoSistema(long tiempoSistema) { this.tiempoSistema = tiempoSistema; }
 
     public void marcarLlegada() {
         this.llegada = LocalDateTime.now();
@@ -65,11 +67,21 @@ public class Proceso {
     public void marcarAtencion() {
         this.atencion = LocalDateTime.now();
         this.estado = EN_MEMORIA;
+        
+        // Calcular tiempo de espera: desde que llegó hasta que fue atendido
+        if (llegada != null) {
+            this.tiempoEspera = Duration.between(llegada, atencion).toSeconds();
+        }
     }
 
     public void marcarSalida() {
         this.salida = LocalDateTime.now();
         this.estado = FINALIZADO;
+        
+        // Calcular tiempo en sistema: desde que llegó hasta que salió
+        if (llegada != null) {
+            this.tiempoSistema = Duration.between(llegada, salida).toSeconds();
+        }
     }
     
     public int getEstadoInt() {

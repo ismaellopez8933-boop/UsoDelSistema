@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface IProcesoDAO {
     void insertar(Proceso proceso);
-    void eliminar(String nombre);
-    List<Proceso> obtenerTodos();
+    void eliminar(Proceso proceso);
+    List<Proceso> obtenerTodos(); // Procesos activos
+    List<Proceso> obtenerHistorial(); // Procesos terminados
 }
