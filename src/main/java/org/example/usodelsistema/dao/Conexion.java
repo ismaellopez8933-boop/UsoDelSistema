@@ -19,7 +19,7 @@ public class Conexion {
     public static java.sql.Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             try {
-                // Cargar el driver explícitamente (opcional en versiones nuevas de Java, pero buena práctica)
+                // Cargar el driver explícitamente
                 Class.forName("org.mariadb.jdbc.Driver");
                 
                 connection = DriverManager.getConnection(URL, USER, PASSWORD);

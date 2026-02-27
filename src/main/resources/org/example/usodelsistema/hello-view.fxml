@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Rectangle?>
 
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
@@ -24,8 +25,8 @@
             <!-- Contenedor de la memoria: Borde negro, fondo blanco -->
             <StackPane fx:id="contenedorMemoria" prefWidth="100" prefHeight="400"
                        styleClass="memory-container">
-                <!-- Aquí se agregarán dinámicamente los rectángulos de los procesos -->
-                <VBox fx:id="vboxProcesos" alignment="BOTTOM_CENTER" prefWidth="100" prefHeight="400" />
+                <!-- Usamos Pane para posicionamiento absoluto -->
+                <Pane fx:id="paneProcesos" prefWidth="100" prefHeight="400" />
             </StackPane>
         </VBox>
 

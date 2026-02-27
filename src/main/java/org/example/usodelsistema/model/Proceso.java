@@ -19,6 +19,9 @@ public class Proceso {
     private LocalDateTime salida;
     private String estado;
     
+    // Posición en memoria (0 a 99)
+    private int direccionInicio = -1; 
+    
     // Estos campos se calcularán automáticamente
     private long tiempoEspera;
     private long tiempoSistema;
@@ -52,6 +55,9 @@ public class Proceso {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
+    
+    public int getDireccionInicio() { return direccionInicio; }
+    public void setDireccionInicio(int direccionInicio) { this.direccionInicio = direccionInicio; }
 
     public long getTiempoEspera() { return tiempoEspera; }
     public void setTiempoEspera(long tiempoEspera) { this.tiempoEspera = tiempoEspera; }

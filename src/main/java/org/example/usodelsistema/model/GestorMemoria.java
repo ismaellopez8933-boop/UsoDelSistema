@@ -14,6 +14,9 @@ public class GestorMemoria {
     private final int CAPACIDAD_TOTAL = 100;
     private int memoriaDisponible;
     
+    // Mapa de memoria: true = ocupado, false = libre
+    private boolean[] mapaMemoria;
+    
     private List<Proceso> procesosEnMemoria;
     private Queue<Proceso> colaEspera;
     
@@ -23,6 +26,7 @@ public class GestorMemoria {
 
     private GestorMemoria() {
         this.memoriaDisponible = CAPACIDAD_TOTAL;
+        this.mapaMemoria = new boolean[CAPACIDAD_TOTAL]; // Inicialmente todo false (libre)
         this.procesosEnMemoria = new ArrayList<>();
         this.colaEspera = new LinkedList<>();
         this.procesoDAO = new ProcesoDAOImpl();
@@ -45,21 +49,63 @@ public class GestorMemoria {
         }
     }
 
+    // Método para buscar espacio contiguo (First Fit)
+    private int buscarEspacioLibre(int tamano) {
+        int contador = 0;
+        int inicio = -1;
+        
+        for (int i = 0; i < CAPACIDAD_TOTAL; i++) {
+            if (!mapaMemoria[i]) {
+                if (contador == 0) inicio = i;
+                contador++;
+                if (contador == tamano) return inicio; // Encontró espacio suficiente
+            } else {
+                contador = 0;
+                inicio = -1;
+            }
+        }
+        return -1; // No hay espacio contiguo suficiente
+    }
+    
+    private void ocuparMemoria(int inicio, int tamano) {
+        for (int i = inicio; i < inicio + tamano; i++) {
+            mapaMemoria[i] = true;
+        }
+        memoriaDisponible -= tamano;
+    }
+    
+    private void liberarMemoria(int inicio, int tamano) {
+        for (int i = inicio; i < inicio + tamano; i++) {
+            mapaMemoria[i] = false;
+        }
+        memoriaDisponible += tamano;
+    }
+
     public boolean agregarProceso(Proceso p) {
         if (p.getTamaño() > CAPACIDAD_TOTAL) {
             System.out.println("El proceso es demasiado grande.");
             return false;
         }
 
-        if (p.getTamaño() <= memoriaDisponible) {
+        // Buscar si hay espacio contiguo disponible
+        int direccionInicio = buscarEspacioLibre(p.getTamaño());
+
+        if (direccionInicio != -1) {
+            // Asignar a memoria
             p.setEstado(Proceso.EN_MEMORIA);
+            p.setDireccionInicio(direccionInicio);
             p.marcarAtencion();
+            
+            ocuparMemoria(direccionInicio, p.getTamaño());
             procesosEnMemoria.add(p);
-            memoriaDisponible -= p.getTamaño();
+            
+            System.out.println("Proceso " + p.getId() + " asignado en dirección " + direccionInicio);
         } else {
+            // A la cola
             p.setEstado(Proceso.EN_ESPERA);
             p.marcarLlegada();
             colaEspera.add(p);
+            System.out.println("Proceso " + p.getId() + " a cola de espera (no hay espacio contiguo o memoria llena).");
         }
 
         procesoDAO.insertar(p);
@@ -80,13 +126,14 @@ public class GestorMemoria {
 
         if (aEliminar != null) {
             procesosEnMemoria.remove(aEliminar);
-            memoriaDisponible += aEliminar.getTamaño();
             
-            // Marcar salida y calcular tiempos finales
+            // Liberar el espacio específico que ocupaba
+            liberarMemoria(aEliminar.getDireccionInicio(), aEliminar.getTamaño());
+            
             aEliminar.marcarSalida();
-            
-            // Pasar el objeto completo al DAO para que guarde el historial
             procesoDAO.eliminar(aEliminar);
+            
+            System.out.println("Proceso " + nombre + " eliminado. Memoria liberada en dir " + aEliminar.getDireccionInicio());
             
             verificarCola();
             notificarCambio();
@@ -102,10 +149,7 @@ public class GestorMemoria {
             }
             if(enCola != null) {
                 colaEspera.remove(enCola);
-                
-                // Marcar salida (aunque no entró a memoria, salió del sistema)
                 enCola.marcarSalida();
-                
                 procesoDAO.eliminar(enCola);
                 notificarCambio();
                 return true;
@@ -117,20 +161,22 @@ public class GestorMemoria {
     private void verificarCola() {
         if (colaEspera.isEmpty()) return;
 
-        Proceso siguiente = colaEspera.peek();
         
-        if (siguiente.getTamaño() <= memoriaDisponible) {
-            colaEspera.poll();
+        Proceso siguiente = colaEspera.peek();
+        int direccionInicio = buscarEspacioLibre(siguiente.getTamaño());
+        
+        if (direccionInicio != -1) {
+            colaEspera.poll(); // Sacar de la cola
             
             siguiente.setEstado(Proceso.EN_MEMORIA);
+            siguiente.setDireccionInicio(direccionInicio);
             siguiente.marcarAtencion();
             
+            ocuparMemoria(direccionInicio, siguiente.getTamaño());
             procesosEnMemoria.add(siguiente);
-            memoriaDisponible -= siguiente.getTamaño();
             
-            // Aquí podríamos actualizar el estado en BD si tuviéramos update
-            // procesoDAO.actualizar(siguiente);
-            
+            System.out.println("Proceso " + siguiente.getId() + " movido de cola a memoria en dir " + direccionInicio);
+
             verificarCola();
         }
     }

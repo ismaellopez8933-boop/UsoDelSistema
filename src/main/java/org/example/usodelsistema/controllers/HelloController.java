@@ -4,8 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -21,8 +21,9 @@ public class HelloController {
     @FXML
     private Label welcomeText;
     
+    // Cambiamos VBox por Pane para posicionamiento absoluto
     @FXML
-    private VBox vboxProcesos;
+    private Pane paneProcesos;
     
     @FXML
     private Label lblEstadoMemoria;
@@ -43,47 +44,57 @@ public class HelloController {
 
     private void actualizarVista() {
         // Limpiar vista actual
-        vboxProcesos.getChildren().clear();
+        paneProcesos.getChildren().clear();
         
         List<Proceso> procesos = gestor.getProcesosEnMemoria();
         
         // Factor de escala: 400px altura total / 100 unidades memoria = 4px por unidad
         double factorEscala = 4.0; 
+        double alturaTotalPane = 400.0;
         
         for (Proceso p : procesos) {
             double altura = p.getTamaño() * factorEscala;
             
+            // Calcular posición Y (invertida para que 0 esté abajo)
+            // Y = AlturaTotal - (Inicio * Factor) - AlturaProceso
+            double yPos = alturaTotalPane - (p.getDireccionInicio() * factorEscala) - altura;
+            
             // Crear rectángulo visual
             Rectangle rect = new Rectangle(100, altura);
-            rect.setFill(generarColorAleatorio());
+            rect.setFill(generarColorAleatorio(p.getId())); // Color consistente por ID
             rect.setStroke(Color.WHITE);
             rect.setStrokeWidth(1);
-            rect.setArcWidth(5); // Bordes redondeados
+            rect.setArcWidth(5);
             rect.setArcHeight(5);
             
             // Etiqueta con nombre y tamaño
-            Label lbl = new Label(p.getId() + " (" + p.getTamaño() + ")");
-            lbl.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 2, 0, 0, 1);");
+            Label lbl = new Label(p.getId() + "\n(" + p.getTamaño() + ")");
+            lbl.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 2, 0, 0, 1); -fx-alignment: center;");
             
-            // Contenedor para el proceso (rectángulo + etiqueta)
+            // Contenedor para el proceso
             StackPane stack = new StackPane();
             stack.getChildren().addAll(rect, lbl);
             
-            // Agregar al VBox (se apilan de abajo hacia arriba si usamos alignment BOTTOM_CENTER en FXML)
-            vboxProcesos.getChildren().add(0, stack); // Agregar al inicio para que se apilen visualmente correcto
+            // Posicionar en el Pane
+            stack.setLayoutX(0);
+            stack.setLayoutY(yPos);
+            stack.setPrefSize(100, altura);
+            
+            paneProcesos.getChildren().add(stack);
         }
         
         // Actualizar etiqueta de estado
         lblEstadoMemoria.setText("Disponible: " + gestor.getMemoriaDisponible() + " / " + gestor.getCapacidadTotal());
     }
     
-    private Color generarColorAleatorio() {
-        // Generar colores pasteles/agradables
-        float hue = random.nextFloat();
-        // Saturation entre 0.5 y 0.9
-        float saturation = 0.5f + random.nextFloat() * 0.4f;
-        // Brightness entre 0.6 y 0.9
-        float brightness = 0.6f + random.nextFloat() * 0.3f;
+    // Generar color basado en el nombre para que sea consistente (mismo proceso = mismo color)
+    private Color generarColorAleatorio(String seed) {
+        int hash = seed.hashCode();
+        Random r = new Random(hash);
+        
+        float hue = r.nextFloat();
+        float saturation = 0.5f + r.nextFloat() * 0.4f;
+        float brightness = 0.6f + r.nextFloat() * 0.3f;
         
         return Color.hsb(hue * 360, saturation, brightness);
     }
