@@ -24,6 +24,11 @@ public class GestorMemoria {
     
     private Runnable onCambioEstado;
 
+    // Tipos de algoritmos
+    public static final int PRIMER_AJUSTE = 1;
+    public static final int MEJOR_AJUSTE = 2;
+    private int algoritmoActual = PRIMER_AJUSTE; // Por defecto
+
     private GestorMemoria() {
         this.memoriaDisponible = CAPACIDAD_TOTAL;
         this.mapaMemoria = new boolean[CAPACIDAD_TOTAL]; // Inicialmente todo false (libre)
@@ -39,6 +44,11 @@ public class GestorMemoria {
         return instance;
     }
     
+    public void setAlgoritmo(int algoritmo) {
+        this.algoritmoActual = algoritmo;
+        System.out.println("Algoritmo cambiado a: " + (algoritmo == PRIMER_AJUSTE ? "Primer Ajuste" : "Mejor Ajuste"));
+    }
+    
     public void setOnCambioEstado(Runnable callback) {
         this.onCambioEstado = callback;
     }
@@ -49,8 +59,17 @@ public class GestorMemoria {
         }
     }
 
-    // Método para buscar espacio contiguo (First Fit)
+    // Método para buscar espacio según el algoritmo seleccionado
     private int buscarEspacioLibre(int tamano) {
+        if (algoritmoActual == PRIMER_AJUSTE) {
+            return buscarPrimerAjuste(tamano);
+        } else {
+            return buscarMejorAjuste(tamano);
+        }
+    }
+
+    // Primer Ajuste: Devuelve el primer hueco donde quepa
+    private int buscarPrimerAjuste(int tamano) {
         int contador = 0;
         int inicio = -1;
         
@@ -58,13 +77,47 @@ public class GestorMemoria {
             if (!mapaMemoria[i]) {
                 if (contador == 0) inicio = i;
                 contador++;
-                if (contador == tamano) return inicio; // Encontró espacio suficiente
+                if (contador == tamano) return inicio; // Encontró el primer espacio suficiente
             } else {
                 contador = 0;
                 inicio = -1;
             }
         }
         return -1; // No hay espacio contiguo suficiente
+    }
+    
+    // Mejor Ajuste: Devuelve el hueco MÁS GRANDE que exista
+    // (Según tu descripción: "va a meter el proceso en el hueco con mayor espacio que exista")
+    // Nota: Tradicionalmente "Best Fit" es el hueco más pequeño donde quepa, 
+    // pero implementaré exactamente lo que pediste: "el hueco con mayor espacio".
+    // Esto en literatura se conoce como "Worst Fit" (Peor Ajuste).
+    private int buscarMejorAjuste(int tamano) {
+        int mejorInicio = -1;
+        int maxHuecoEncontrado = -1;
+        
+        int contadorActual = 0;
+        int inicioActual = -1;
+        
+        for (int i = 0; i <= CAPACIDAD_TOTAL; i++) {
+            // Evaluamos hasta <= CAPACIDAD_TOTAL para poder cerrar el último hueco si está al final
+            if (i < CAPACIDAD_TOTAL && !mapaMemoria[i]) {
+                if (contadorActual == 0) inicioActual = i;
+                contadorActual++;
+            } else {
+                // Se acabó un hueco (o llegamos al final de la memoria)
+                if (contadorActual > 0) {
+                    // Si el hueco actual es lo suficientemente grande Y es mayor que el hueco máximo que hemos visto
+                    if (contadorActual >= tamano && contadorActual > maxHuecoEncontrado) {
+                        maxHuecoEncontrado = contadorActual;
+                        mejorInicio = inicioActual;
+                    }
+                }
+                contadorActual = 0;
+                inicioActual = -1;
+            }
+        }
+        
+        return mejorInicio;
     }
     
     private void ocuparMemoria(int inicio, int tamano) {
@@ -87,7 +140,7 @@ public class GestorMemoria {
             return false;
         }
 
-        // Buscar si hay espacio contiguo disponible
+        // Buscar si hay espacio contiguo disponible usando el algoritmo actual
         int direccionInicio = buscarEspacioLibre(p.getTamaño());
 
         if (direccionInicio != -1) {
@@ -99,13 +152,14 @@ public class GestorMemoria {
             ocuparMemoria(direccionInicio, p.getTamaño());
             procesosEnMemoria.add(p);
             
-            System.out.println("Proceso " + p.getId() + " asignado en dirección " + direccionInicio);
+            System.out.println("Proceso " + p.getId() + " asignado en dir " + direccionInicio + " con " + 
+                               (algoritmoActual == PRIMER_AJUSTE ? "Primer Ajuste" : "Mejor Ajuste"));
         } else {
             // A la cola
             p.setEstado(Proceso.EN_ESPERA);
             p.marcarLlegada();
             colaEspera.add(p);
-            System.out.println("Proceso " + p.getId() + " a cola de espera (no hay espacio contiguo o memoria llena).");
+            System.out.println("Proceso " + p.getId() + " a cola de espera.");
         }
 
         procesoDAO.insertar(p);
@@ -161,7 +215,6 @@ public class GestorMemoria {
     private void verificarCola() {
         if (colaEspera.isEmpty()) return;
 
-        
         Proceso siguiente = colaEspera.peek();
         int direccionInicio = buscarEspacioLibre(siguiente.getTamaño());
         

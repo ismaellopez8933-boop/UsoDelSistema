@@ -28,7 +28,7 @@ public class MemoriaController {
     @FXML private Button btnCompactar;
 
 
-    public class MemoriaController {
+    public class memoriaController {
 
     @FXML private Pane memoriaPane;           // Pane donde se dibuja la base
     @FXML private TableView<Proceso> tabla;   // TableView para procesos (usa Proceso simple)
@@ -207,3 +207,4 @@ public class MemoriaController {
         a.showAndWait();
     }
 }
+    }

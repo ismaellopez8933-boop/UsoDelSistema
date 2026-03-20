@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -32,6 +34,16 @@
 
         <!-- Panel de Control -->
         <VBox spacing="15.0" alignment="CENTER">
+            <!-- Algoritmos de Asignación -->
+            <VBox spacing="5.0" alignment="CENTER_LEFT" styleClass="memory-container">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+                <Label text="Algoritmo de Asignación" style="-fx-font-weight: bold;"/>
+                <RadioButton fx:id="rbPrimerAjuste" text="Primer Ajuste" selected="true" onAction="#onAlgoritmoCambiado"/>
+                <RadioButton fx:id="rbMejorAjuste" text="Mejor Ajuste" onAction="#onAlgoritmoCambiado"/>
+            </VBox>
+
             <Button text="Agregar Proceso" onAction="#onAddButtonClick" prefWidth="150" styleClass="button-success"/>
             <Button text="Eliminar Proceso" onAction="#onDeleteButtonClick" prefWidth="150" styleClass="button-danger"/>
             <Button text="Ver Historial" onAction="#onReportButtonClick" prefWidth="150" styleClass="button"/>

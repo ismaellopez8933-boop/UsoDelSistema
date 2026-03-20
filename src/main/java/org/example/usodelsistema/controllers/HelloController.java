@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -21,12 +22,17 @@ public class HelloController {
     @FXML
     private Label welcomeText;
     
-    // Cambiamos VBox por Pane para posicionamiento absoluto
     @FXML
     private Pane paneProcesos;
     
     @FXML
     private Label lblEstadoMemoria;
+
+    @FXML
+    private RadioButton rbPrimerAjuste;
+    
+    @FXML
+    private RadioButton rbMejorAjuste;
 
     private GestorMemoria gestor;
     private Random random = new Random();
@@ -35,47 +41,53 @@ public class HelloController {
     public void initialize() {
         gestor = GestorMemoria.getInstance();
         
+        // Configurar el algoritmo inicial
+        javafx.scene.control.ToggleGroup toggleGroup = new javafx.scene.control.ToggleGroup();
+        rbPrimerAjuste.setToggleGroup(toggleGroup);
+        rbMejorAjuste.setToggleGroup(toggleGroup);
+        
         // Suscribirse a cambios en el gestor
         gestor.setOnCambioEstado(this::actualizarVista);
         
         // Dibujar estado inicial
         actualizarVista();
     }
+    
+    @FXML
+    protected void onAlgoritmoCambiado() {
+        if (rbPrimerAjuste.isSelected()) {
+            gestor.setAlgoritmo(GestorMemoria.PRIMER_AJUSTE);
+        } else if (rbMejorAjuste.isSelected()) {
+            gestor.setAlgoritmo(GestorMemoria.MEJOR_AJUSTE);
+        }
+    }
 
     private void actualizarVista() {
-        // Limpiar vista actual
         paneProcesos.getChildren().clear();
         
         List<Proceso> procesos = gestor.getProcesosEnMemoria();
         
-        // Factor de escala: 400px altura total / 100 unidades memoria = 4px por unidad
         double factorEscala = 4.0; 
         double alturaTotalPane = 400.0;
         
         for (Proceso p : procesos) {
             double altura = p.getTamaño() * factorEscala;
             
-            // Calcular posición Y (invertida para que 0 esté abajo)
-            // Y = AlturaTotal - (Inicio * Factor) - AlturaProceso
             double yPos = alturaTotalPane - (p.getDireccionInicio() * factorEscala) - altura;
             
-            // Crear rectángulo visual
             Rectangle rect = new Rectangle(100, altura);
-            rect.setFill(generarColorAleatorio(p.getId())); // Color consistente por ID
+            rect.setFill(generarColorAleatorio(p.getId()));
             rect.setStroke(Color.WHITE);
             rect.setStrokeWidth(1);
             rect.setArcWidth(5);
             rect.setArcHeight(5);
             
-            // Etiqueta con nombre y tamaño
             Label lbl = new Label(p.getId() + "\n(" + p.getTamaño() + ")");
             lbl.setStyle("-fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow(one-pass-box, rgba(0,0,0,0.5), 2, 0, 0, 1); -fx-alignment: center;");
             
-            // Contenedor para el proceso
             StackPane stack = new StackPane();
             stack.getChildren().addAll(rect, lbl);
             
-            // Posicionar en el Pane
             stack.setLayoutX(0);
             stack.setLayoutY(yPos);
             stack.setPrefSize(100, altura);
@@ -83,11 +95,9 @@ public class HelloController {
             paneProcesos.getChildren().add(stack);
         }
         
-        // Actualizar etiqueta de estado
         lblEstadoMemoria.setText("Disponible: " + gestor.getMemoriaDisponible() + " / " + gestor.getCapacidadTotal());
     }
     
-    // Generar color basado en el nombre para que sea consistente (mismo proceso = mismo color)
     private Color generarColorAleatorio(String seed) {
         int hash = seed.hashCode();
         Random r = new Random(hash);
